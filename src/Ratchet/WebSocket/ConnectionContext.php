@@ -1,7 +1,6 @@
 <?php
 namespace Ratchet\WebSocket;
 use Ratchet\ConnectionInterface;
-use Ratchet\MessageComponentInterface;
 use Ratchet\RFC6455\Messaging\Protocol\Frame;
 use Ratchet\RFC6455\Messaging\Protocol\FrameInterface;
 use Ratchet\RFC6455\Messaging\Protocol\MessageInterface;
@@ -62,7 +61,7 @@ class ConnectionContext implements ContextInterface {
     }
 
     public function onMessage(MessageInterface $msg) {
-        $this->component->onMessage($this->conn, $msg->getPayload());
+        $this->component->onMessage($this->conn, $msg);
     }
 
     public function onPing(FrameInterface $frame) {

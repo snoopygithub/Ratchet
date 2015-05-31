@@ -10,7 +10,8 @@ use Ratchet\RFC6455\Messaging\Protocol\Frame;
  */
 class WsConnection extends AbstractConnectionDecorator {
     /**
-     * {@inheritdoc}
+     * @param string|\Ratchet\RFC6455\Messaging\Protocol\DataInterface $msg
+     * @return \Ratchet\ConnectionInterface
      */
     public function send($msg) {
         if (!$this->WebSocket->closing) {
