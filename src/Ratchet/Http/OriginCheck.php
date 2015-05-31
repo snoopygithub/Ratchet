@@ -1,9 +1,9 @@
 <?php
 namespace Ratchet\Http;
-use Guzzle\Http\Message\RequestInterface;
 use Ratchet\ConnectionInterface;
 use Ratchet\Server\DataComponentInterface;
-use Guzzle\Http\Message\Response;
+use Ratchet\MessageComponentInterface;
+use Psr\Http\Message\RequestInterface;
 
 /**
  * A middleware to ensure JavaScript clients connecting are from the expected domain.
@@ -11,12 +11,14 @@ use Guzzle\Http\Message\Response;
  * Note: This can be spoofed from non-web browser clients
  */
 class OriginCheck implements HttpServerInterface {
+    use CloseResponseTrait;
+
     /**
      * @var \Ratchet\Server\DataComponentInterface
      */
     protected $_component;
 
-    public $allowedOrigins = array();
+    public $allowedOrigins = [];
 
     /**
      * @param \Ratchet\Server\DataComponentInterface $component Component/Application to decorate
@@ -33,7 +35,7 @@ class OriginCheck implements HttpServerInterface {
      * {@inheritdoc}
      */
     public function onOpen(ConnectionInterface $conn, RequestInterface $request = null) {
-        $header = (string)$request->getHeader('Origin');
+        $header = (string)$request->getHeader('Origin')[0];
         $origin = parse_url($header, PHP_URL_HOST) ?: $header;
 
         if (!in_array($origin, $this->allowedOrigins)) {
@@ -62,20 +64,5 @@ class OriginCheck implements HttpServerInterface {
      */
     function onError(ConnectionInterface $conn, \Exception $e) {
         return $this->_component->onError($conn, $e);
-    }
-
-    /**
-     * Close a connection with an HTTP response
-     * @param \Ratchet\ConnectionInterface $conn
-     * @param int                          $code HTTP status code
-     * @return null
-     */
-    protected function close(ConnectionInterface $conn, $code = 400) {
-        $response = new Response($code, array(
-            'X-Powered-By' => \Ratchet\VERSION
-        ));
-
-        $conn->send((string)$response);
-        $conn->close();
     }
 }

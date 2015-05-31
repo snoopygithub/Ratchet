@@ -16,7 +16,7 @@ class WampServer implements MessageComponentInterface, WsServerInterface {
     /**
      * @var ServerProtocol
      */
-    private $wampProtocol;
+    protected $wampProtocol;
 
     /**
      * This class just makes it 1 step easier to use Topic objects in WAMP
@@ -41,8 +41,6 @@ class WampServer implements MessageComponentInterface, WsServerInterface {
         try {
             $this->wampProtocol->onMessage($conn, $msg);
         } catch (Exception $we) {
-            $conn->close(1007);
-        } catch (JsonException $je) {
             $conn->close(1007);
         }
     }
