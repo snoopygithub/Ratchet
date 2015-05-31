@@ -38,7 +38,7 @@ class SessionProvider implements HttpServerInterface {
     protected $_serializer;
 
     /**
-     * @param \Ratchet\HttpServerInterface                $app
+     * @param \Ratchet\Http\HttpServerInterface           $app
      * @param \SessionHandlerInterface                    $handler
      * @param array                                       $options
      * @param \Ratchet\Session\Serialize\HandlerInterface $serializer

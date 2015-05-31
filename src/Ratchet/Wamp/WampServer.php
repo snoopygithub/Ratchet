@@ -2,7 +2,7 @@
 namespace Ratchet\Wamp;
 use Ratchet\WebSocket\MessageComponentInterface;
 use Ratchet\WebSocket\WsServerInterface;
-use Ratchet\WebSocket\Version\MessageInterface;
+use Ratchet\RFC6455\Messaging\Protocol\MessageInterface;
 use Ratchet\ConnectionInterface;
 
 /**

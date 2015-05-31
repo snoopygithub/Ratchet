@@ -2,7 +2,8 @@
 namespace Ratchet\Wamp;
 use Ratchet\WebSocket\MessageComponentInterface;
 use Ratchet\WebSocket\WsServerInterface;
-use Ratchet\WebSocket\Version\MessageInterface;
+use Ratchet\RFC6455\Messaging\Protocol\MessageInterface;
+use Ratchet\RFC6455\Messaging\Protocol\Frame;
 use Ratchet\ConnectionInterface;
 
 /**
@@ -84,6 +85,10 @@ class ServerProtocol implements MessageComponentInterface, WsServerInterface {
      * @throws \Ratchet\Wamp\JsonException
      */
     public function onMessage(ConnectionInterface $from, MessageInterface $msg) {
+        if ($msg->isBinary()) {
+            return $from->close(Frame::CLOSE_BAD_DATA);
+        }
+
         $from = $this->connections[$from];
 
         if (null === ($json = @json_decode($msg, true))) {
