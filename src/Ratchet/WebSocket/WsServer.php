@@ -5,6 +5,7 @@ use Ratchet\Http\HttpServerInterface;
 use Ratchet\Http\CloseResponseTrait;
 use Psr\Http\Message\RequestInterface;
 use GuzzleHttp\Psr7 as gPsr;
+use Ratchet\RFC6455\Encoding;
 use Ratchet\RFC6455\Messaging\Protocol\FrameInterface;
 use Ratchet\RFC6455\Messaging\Protocol\MessageInterface;
 use Ratchet\RFC6455\Messaging\Streaming\MessageStreamer;
@@ -46,6 +47,14 @@ class WsServer implements HttpServerInterface {
      */
     private $handshakeNegotiator;
 
+    /**
+     * @var \Closure
+     */
+    private $ueFlowFactory;
+
+    /**
+     * @var \Closure
+     */
     private $pongReceiver;
 
     /**
@@ -56,7 +65,7 @@ class WsServer implements HttpServerInterface {
         $this->delegate    = $component;
         $this->connections = new \SplObjectStorage;
 
-        $this->encodingValidator   = new \Ratchet\RFC6455\Encoding\Validator;
+        $this->encodingValidator   = new Encoding\Validator;
         $this->closeFrameChecker   = new \Ratchet\RFC6455\Messaging\Protocol\CloseFrameChecker;
         $this->handshakeNegotiator = new \Ratchet\RFC6455\Handshake\Negotiator($this->encodingValidator);
 
@@ -65,6 +74,11 @@ class WsServer implements HttpServerInterface {
         }
 
         $this->pongReceiver = function() {};
+
+        $reusableUnderflowException = new \UnderflowException;
+        $this->ueFlowFactory = function() use ($reusableUnderflowException) {
+            return $reusableUnderflowException;
+        };
     }
 
     /**
@@ -99,7 +113,9 @@ class WsServer implements HttpServerInterface {
             },
             function(FrameInterface $frame) use ($wsConn) {
                 $this->onControlFrame($frame, $wsConn);
-            }
+            },
+            true,
+            $this->ueFlowFactory
         );
 
         $this->connections->attach($conn, [$wsConn, $streamer]);
@@ -165,7 +181,7 @@ class WsServer implements HttpServerInterface {
      * @return WsServer
      */
     public function setEncodingChecks($opt) {
-//        $this->validator->on = (boolean)$opt;
+        $this->encodingValidator = $opt ? new Encoding\Validator : new Encoding\NullValidator;
 
         return $this;
     }
