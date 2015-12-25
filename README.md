@@ -35,8 +35,9 @@ Need help?  Have a question?  Want to provide feedback?  Write a message on the 
 
 ```php
 <?php
-use Ratchet\MessageComponentInterface;
 use Ratchet\ConnectionInterface;
+use Ratchet\WebSocket\MessageComponentInterface;
+use Ratchet\RFC6455\Messaging\Protocol\MessageInterface;
 
     // Make sure composer dependencies have been installed
     require __DIR__ . '/vendor/autoload.php';
@@ -56,7 +57,7 @@ class MyChat implements MessageComponentInterface {
         $this->clients->attach($conn);
     }
 
-    public function onMessage(ConnectionInterface $from, $msg) {
+    public function onMessage(ConnectionInterface $conn, MessageInterface $msg) {
         foreach ($this->clients as $client) {
             if ($from != $client) {
                 $client->send($msg);
