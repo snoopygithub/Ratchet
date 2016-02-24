@@ -21,9 +21,9 @@ class TopicManager implements WsServerInterface, WampServerInterface {
     /**
      * {@inheritdoc}
      */
-    public function onOpen(ConnectionInterface $conn) {
+    public function onOpen(ConnectionInterface $conn, $m) {
         $conn->WAMP->subscriptions = new \SplObjectStorage;
-        $this->app->onOpen($conn);
+        $this->app->onOpen($conn, $m);
     }
 
     /**
