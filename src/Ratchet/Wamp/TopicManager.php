@@ -9,21 +9,24 @@ class TopicManager implements WsServerInterface, WampServerInterface {
      */
     protected $app;
 
+    protected $m;
+
     /**
      * @var array
      */
     protected $topicLookup = array();
 
-    public function __construct(WampServerInterface $app) {
+    public function __construct(WampServerInterface $app, $m) {
         $this->app = $app;
+	$this->m = $m;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function onOpen(ConnectionInterface $conn, $m) {
+    public function onOpen(ConnectionInterface $conn) {
         $conn->WAMP->subscriptions = new \SplObjectStorage;
-        $this->app->onOpen($conn, $m);
+        $this->app->onOpen($conn, $this->m);
     }
 
     /**
